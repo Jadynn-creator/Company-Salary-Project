@@ -1,8 +1,26 @@
 # Compiled class file
 *.class
 
+#IDE files
+.idea/
+*.iml
+.classpath
+.project
+bin/
+build/
+
+#Database files
+*.db
+
+#System files
+.DS_Store
+Thumbs.db
+
 # Log file
 *.log
+
+#Config files
+config.properties
 
 # BlueJ files
 *.ctxt
