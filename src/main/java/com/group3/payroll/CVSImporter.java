@@ -92,4 +92,14 @@ return importedCount;
         tokens.add(field.toString());
         return tokens.toArray(new String[0]);
     }
+//Clear existing data from tables
+    public void clearTables() throws SQLException{
+        try (Statement stmt = connection.createStatement()){
+            stmt.execute("SET FOREIGN_KEY_CHECKS=0");
+            stmt.execute("TRUNCATE TABLE Salaries");
+            stmt.execute("TRUNCATE TABLE Employees");
+            stmt.execute("SET FOREIGN_KEY_CHECKS =1");
+        }
+    }
+
 }
