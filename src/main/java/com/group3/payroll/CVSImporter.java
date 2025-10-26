@@ -101,5 +101,31 @@ return importedCount;
             stmt.execute("SET FOREIGN_KEY_CHECKS =1");
         }
     }
-
+//how to verify if the import was successful?
+    public void verifyImport() throws SQLException{
+        //uses sql statements to count records and check for orphaned salary records which do not have matching employees
+        String countEmployees ="SELECT COUNT(*) AS total FROM Employees";
+        String countSalaries ="SELECT COUNT(*) AS total FROM Salaries";
+        String orphanCheck = "SELECT COUNT(*) AS orphaned FROM Salaries s LEFT JOIN Employees e ON s.employee_id = e.id WHERE e.id IS NULL";
+        //using try to test and display number records imported and any orphaned records
+        try (Statement stmt = connection.createStatement()){
+            ResultSet rs = stmt.executeQuery(countEmployees);
+            if (rs.next()){
+                System.out.println("Total Employees Imported: " + rs.getInt("total"));
+            }
+            rs = stmt.executeQuery(countSalaries);
+            if (rs.next()){
+                System.out.println("Total Salaries Imported: " + rs.getInt("total"));
+            }
+            rs = stmt.executeQuery(orphanCheck);
+            if (rs.next()){
+                int orphans= rs.getInt("orphans");
+                if (orphans> 0){
+                    System.out.println("Warning: There are " + orphans + " salary records without matching employees.");
+                } else {
+                    System.out.println("All salary records have matching employees.");
+                }
+            }
+        }
+    }
 }
