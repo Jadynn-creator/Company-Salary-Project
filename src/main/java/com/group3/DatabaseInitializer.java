@@ -83,10 +83,22 @@ public class DatabaseInitializer {
             System.out.println("Salaries table ready");
             
             // Create indexes for better performance
-            stmt.execute("CREATE INDEX  idx_emp_dept ON Employees(department)");
-            stmt.execute("CREATE INDEX  idx_sal_emp ON Salaries(employee_id)");
-            stmt.execute("CREATE INDEX  idx_sal_month ON Salaries(month)");
+            createIndexSafely(stmt, "idx_emp_dept", "CREATE INDEX idx_emp_dept ON Employees(department)");
+            createIndexSafely(stmt, "idx_sal_emp", "CREATE INDEX idx_sal_emp ON Salaries(employee_id)");
+            createIndexSafely(stmt, "idx_sal_month", "CREATE INDEX idx_sal_month ON Salaries(month)");
             System.out.println("Indexes created");
+        }
+    }
+     private static void createIndexSafely(Statement stmt, String indexName, String createIndexSQL) {
+        try {
+            stmt.execute(createIndexSQL);
+            System.out.println(" Index created: " + indexName);
+        } catch (SQLException e) {
+            if (e.getMessage().contains("Duplicate key name") || e.getMessage().contains("already exists")) {
+                System.out.println("  Index already exists: " + indexName);
+            } else {
+                System.err.println(" Error creating index " + indexName + ": " + e.getMessage());
+            }
         }
     }
     
