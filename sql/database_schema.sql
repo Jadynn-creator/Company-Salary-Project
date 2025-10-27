@@ -1,9 +1,4 @@
---Database schema for Company Salary Project
-DROP DATABASE IF EXISTS company_payroll;
-CREATE DATABASE company_payroll;
-USE company_payroll;
-
---Table to store employee information
+--NO LONGER NEEDED
 CREATE Table Employees(
     employee_id VARCHAR(10) PRIMARY KEY,
     first_name VARCHAR(50) NOT NULL,

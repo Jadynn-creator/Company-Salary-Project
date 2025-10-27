@@ -6,7 +6,7 @@ import java.io.*;
 
 //Database connection class
 public class DatabaseConnection{
-    //define the configuration file path
+    //define the configuration file
     private static final String PROPERTIES_FILE="config.properties";
 
     public static Connection getConnection() throws IOException,SQLException{
@@ -21,39 +21,101 @@ public class DatabaseConnection{
         String user = props.getProperty("db.user","root");
         String password = props.getProperty("db.password","password");
 
-        //establish and return the database connection details
-        return DriverManager.getConnection (url,user,password);
+        System.out.println("Connecting to "+url+" with user "+user);
+
+        //return the database connection details
+        try{
+            return DriverManager.getConnection(url,user,password);
+        }catch (SQLException e){
+           if (e.getMessage().contains("Unknown database")){
+                System.out.println("Database does not exist. Creating database...");
+                createDatabase(user,password);
+                return DriverManager.getConnection(url,user,password);
+
+           }else{
+               throw e;
+           }
+        }
     }
-    //initialize database schema
-    public static void initializeDatabase()throws IOException,SQLException{
-        try (Connection conn = getConnection();
+    //method to create the database if it does not exist
+    private static void createDatabase (String user, String password) throws SQLException{
+        String url = "jdbc:mysql://localhost:3306/";
+        try (Connection conn = DriverManager.getConnection (url,user,password);
              Statement stmt = conn.createStatement()){
+                 stmt.execute("CREATE DATABASE IF NOT EXISTS company_payroll");
+                 System.out.println("Database 'company_payroll' created successfully.");
 
-                //read the SQL schema from a file
-                String schemaSql =readSQLFile("sql/database_schema.sql");
-                String[] queries = schemaSql.split(";");
+                 stmt.execute("USE company_payroll");
 
-                for (String query:queries){
-                    if (!query.trim().isEmpty()){
-                        stmt.execute(query);
-                    }
-                }
-                //print confirmation message
-                System.out.println("Database initialized successfully.");
+                 stmt.execute("USE company_roll");
 
-             }
+                 createTables(stmt);
+        }
+    }
+     private static void createTables(Statement stmt) throws SQLException {
+        // Employees Table
+        String createEmployees = 
+            "CREATE TABLE IF NOT EXISTS Employees (" +
+            "    employee_id VARCHAR(10) PRIMARY KEY," +
+            "    first_name VARCHAR(50) NOT NULL," +
+            "    last_name VARCHAR(50) NOT NULL," +
+            "    department VARCHAR(50) NOT NULL," +
+            "    hire_date DATE NOT NULL," +
+            "    INDEX idx_department (department)," +
+            "    INDEX idx_hire_date (hire_date)" +
+            ")";
+        stmt.execute(createEmployees);
+        System.out.println(" Employees table created");
         
-        }
-    //method to read SQL from a file
-    private static String readSQLFile(String filepath)throws IOException{
-        StringBuilder content = new StringBuilder();
-        try (BufferedReader reader = new BufferedReader(new FileReader (filepath))){
-            String line;
-            while ((line = reader.readLine()) !=null){
-                content.append(line).append("\n");
-            }
-        }
-        return content.toString();
+        // Salaries Table
+        String createSalaries =
+            "CREATE TABLE IF NOT EXISTS Salaries (" +
+            "    salary_id VARCHAR(10) PRIMARY KEY," +
+            "    employee_id VARCHAR(10) NOT NULL," +
+            "    month VARCHAR(7) NOT NULL," +
+            "    amount DECIMAL(10, 2) NOT NULL," +
+            "    FOREIGN KEY (employee_id) REFERENCES Employees(employee_id) ON DELETE CASCADE," +
+            "    UNIQUE KEY unique_employee_month (employee_id, month)," +
+            "    INDEX idx_employee_id (employee_id)," +
+            "    INDEX idx_month (month)" +
+            ")";
+        stmt.execute(createSalaries);
+        System.out.println(" Salaries table created");
     }
     
+    // Initialize database method
+     
+    public static void initializeDatabase() throws SQLException, IOException {
+        try (Connection conn = getConnection()) {
+            System.out.println(" Database initialized and ready");
+            
+            // Verify tables exist
+            verifyTables(conn);
+        }
+    }
+    
+    //Verify all tables exist and are accessible
+
+    private static void verifyTables(Connection conn) throws SQLException {
+        try (Statement stmt = conn.createStatement()) {
+            ResultSet rs = stmt.executeQuery("SHOW TABLES");
+            System.out.println("Tables in database:");
+            while (rs.next()) {
+                System.out.println(" " + rs.getString(1));
+            }
+            
+            // Check table counts
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM Employees");
+            if (rs.next()) {
+                System.out.println("Employees records: " + rs.getInt(1));
+            }
+            
+            rs = stmt.executeQuery("SELECT COUNT(*) FROM Salaries");
+            if (rs.next()) {
+                System.out.println("Salaries records: " + rs.getInt(1));
+            }
+        }
+    }
+    
+   
 }

@@ -2,6 +2,9 @@ package main.java.com.group3.payroll;
 //import necessary libraries
 import javax.swing.*;
 import javax.swing.filechooser.*;
+
+import main.java.com.group3.DatabaseInitializer;
+
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -55,18 +58,18 @@ public class DataImportTool extends JFrame{
         importSalaries.addActionListener(e -> importSalaries());
 
     }
-    private void initializeDatabase(){
-        try {
-            DatabaseConnection.initializeDatabase();
-            connection = DatabaseConnection.getConnection();
-            cvsImporter = new CVSImporter(connection);
-            log("Database initialized successfully.");
-        } catch (Exception ex){
-            log("Error initializing database: " + ex.getMessage());
-            ex.printStackTrace();
-        }
+   private void initializeDatabase() {
+    try {
+        // Use the comprehensive database setup
+        DatabaseInitializer.setupDatabase();
+        connection = DatabaseConnection.getConnection();
+        cvsImporter = new CVSImporter(connection);
+        log("Database initialized successfully");
+    } catch (Exception ex) {
+        log("Error initializing database: " + ex.getMessage());
+        ex.printStackTrace();
     }
-
+}
     private void importEmployees(){
         if (connection == null){
             log("Please initialize the database first.\n");
