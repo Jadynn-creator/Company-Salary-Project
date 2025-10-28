@@ -25,7 +25,7 @@ public class CVSImporter{
                     String[] data = parseCVSLine(line);
                     if (data.length == 5){
                         pstmt.setString(1, data[0]);
-                        //employee name
+                        //employee id
                         pstmt.setString(2, data[1]);
                         //first name
                         pstmt.setString(3, data[2]);
