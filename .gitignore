@@ -20,7 +20,6 @@ Thumbs.db
 *.log
 
 #Config files
-config.properties
 
 # BlueJ files
 *.ctxt
