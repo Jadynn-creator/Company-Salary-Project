@@ -2,12 +2,7 @@
 *.class
 
 #IDE files
-.idea/
-*.iml
-.classpath
-.project
-bin/
-build/
+
 
 #Database files
 *.db
