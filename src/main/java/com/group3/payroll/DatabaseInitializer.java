@@ -1,4 +1,4 @@
-package main.java.com.group3;
+package main.java.com.group3.payroll;
 
 
 import java.sql.*;
