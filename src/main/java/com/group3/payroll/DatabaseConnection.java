@@ -6,13 +6,13 @@ import java.io.*;
 
 //Database connection class
 public class DatabaseConnection{
-    //define the configuration file
-    private static final String PROPERTIES_FILE="config.properties";
+    //define the configureuration file
+    private static final String PROPERTIES_FILE="configure.properties";
 
     public static Connection getConnection() throws IOException,SQLException{
         Properties props = new Properties();
 
-        //load properties from the configuration file
+        //load properties from the configureuration file
         try (InputStream input = new FileInputStream(PROPERTIES_FILE)){
             props.load(input);
 

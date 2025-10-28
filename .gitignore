@@ -28,8 +28,8 @@ Thumbs.db
 # Log file
 *.log
 
-#Config files
-config.properties
+#configure files
+configure.properties.template
 
 # BlueJ files
 *.ctxt

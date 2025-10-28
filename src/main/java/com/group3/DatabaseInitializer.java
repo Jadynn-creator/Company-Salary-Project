@@ -127,7 +127,7 @@ public class DatabaseInitializer {
     
     private static String getDBUsername() throws IOException {
         Properties props = new Properties();
-        try (InputStream input = new FileInputStream("config.properties")) {
+        try (InputStream input = new FileInputStream("configure.properties")) {
             props.load(input);
             return props.getProperty("db.username", "root");
         }
@@ -135,7 +135,7 @@ public class DatabaseInitializer {
     
     private static String getDBPassword() throws IOException {
         Properties props = new Properties();
-        try (InputStream input = new FileInputStream("config.properties")) {
+        try (InputStream input = new FileInputStream("configure.properties")) {
             props.load(input);
             return props.getProperty("db.password", "");
         }
