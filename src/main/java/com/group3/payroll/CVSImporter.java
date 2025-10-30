@@ -6,6 +6,7 @@ import java.util.*;
 
 public class CVSImporter{
     private Connection connection;
+
     public CVSImporter(Connection connection){
         this.connection = connection;
     }
@@ -14,7 +15,7 @@ public class CVSImporter{
     public int importEmployees(String filepath)
      throws SQLException,IOException{
         int importedCount = 0;
-        String sql = "INSERT INTO employees (id, name, department, salary) VALUES (?, ?, ?, ?)";
+        String sql = "INSERT INTO employees (employee_id, first_name,last_name,department,hire_date) VALUES (?, ?, ?, ?, ?)";
         //using a buffered reader for file reading
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath));
         //usimg a prepared statement to prevent SQL injection
@@ -22,23 +23,33 @@ public class CVSImporter{
                 String line=reader.readLine();
                 //skip the header line
                 while ((line = reader.readLine()) !=null) {
-                    String[] data = parseCVSLine(line);
-                    if (data.length == 5){
-                        pstmt.setString(1, data[0]);
-                        //employee id
-                        pstmt.setString(2, data[1]);
-                        //first name
-                        pstmt.setString(3, data[2]);
-                        //last name 
-                        pstmt.setString(4, data[3]);
-                        //department
-                        pstmt.setDate(5, java.sql.Date.valueOf(data[4]));
-                        //date of hire
-
-                        pstmt.executeUpdate();
-                        importedCount++;
+                    if(line.trim().isEmpty()){
+                        continue; //skip empty lines
                     }
-                
+                    String[] data = parseCVSLine(line);
+                    
+                    if (data.length >=5){
+                        try {
+                            pstmt.setString(1,data[0].trim());//employee id
+                            pstmt.setString(2,data[1].trim());//first name
+                            pstmt.setString(3,data[2].trim());//last name
+                            pstmt.setString(4,data[3].trim());//department
+
+                            //to handle errors in importing the date
+                            String dateStr= data[4].trim();
+                            java.sql.Date hireDate = parseDate(dateStr);
+                            pstmt.setDate(5,hireDate);//hire date
+
+                            pstmt.executeUpdate();
+                            importedCount++;
+                        } catch (SQLException e){
+                            System.err.println("Error importing line: " + Arrays.toString(data));
+                            System.err.println("SQLException: " + e.getMessage());
+
+                        }
+                    } else {
+                        System.err.println("Skipping invalid column " + data.length + " in line: " + line);
+                    }
             }
      }
 return importedCount;
@@ -48,26 +59,35 @@ return importedCount;
     public int importSalaries(String filepath)
         throws SQLException,IOException{
         int importedCount = 0;
-        String sql = "INSERT INTO salaries (employee_id, amount, effective_date) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO salaries (salary_id,employee_id,month,amount) VALUES (?, ?, ?, ?)";
         try (BufferedReader reader = new BufferedReader(new FileReader(filepath));
             PreparedStatement pstmt = connection.prepareStatement(sql)) {
                 String line;
                 //skip the header line
                 reader.readLine();
                 while ((line = reader.readLine()) !=null) {
+                    if(line.trim().isEmpty()){
+                        continue; //skip empty 
+                    }
                     String[] data = parseCVSLine(line);
                     if (data.length == 4){
-                        pstmt.setString(1, data[0]);
+                        try{
+                        pstmt.setString(1, data[0].trim());
                         //salary id
-                        pstmt.setString(2, data[1]);
+                        pstmt.setString(2, data[1].trim());
                         //employee id
-                        pstmt.setString(3,data[2]);
+                        pstmt.setString(3,data[2].trim());
                         //month
-                        pstmt.setDouble(4, Double.parseDouble(data[3]));
+                        pstmt.setDouble(4, Double.parseDouble(data[3].trim()));
                         //amount
 
                         pstmt.executeUpdate();
-                        importedCount++;
+                        importedCount++;} catch (SQLException e){
+                            System.err.println("Error importing salary: " + Arrays.toString(data));
+                            System.err.println("SQLException: " + e.getMessage());
+                        }
+                    } else {
+                        System.err.println("Skipping invalid column " + data.length + " in line: " + line);
                     }
             
                 }
@@ -92,6 +112,20 @@ return importedCount;
         tokens.add(field.toString());
         return tokens.toArray(new String[0]);
     }
+    // Parse date from string in format YYYY-MM-DD
+    private java.sql.Date parseDate(String dateStr){
+        try {
+           if (dateStr.contains("-")){
+            return java.sql.Date.valueOf(dateStr);
+           } else {
+            System.err.println("Unrecognized date format: " + dateStr + ". Using current date instead.");
+            return java.sql.Date.valueOf("2000-01-01");
+           }
+        } catch (IllegalArgumentException e){
+            System.err.println("Invalid date format: " + dateStr + ". Using current date instead.");
+            return java.sql.Date.valueOf("2000-01-01");
+        }
+    }
 //Clear existing data from tables
     public void clearTables() throws SQLException{
         try (Statement stmt = connection.createStatement()){
@@ -106,7 +140,7 @@ return importedCount;
         //uses sql statements to count records and check for orphaned salary records which do not have matching employees
         String countEmployees ="SELECT COUNT(*) AS total FROM Employees";
         String countSalaries ="SELECT COUNT(*) AS total FROM Salaries";
-        String orphanCheck = "SELECT COUNT(*) AS orphaned FROM Salaries s LEFT JOIN Employees e ON s.employee_id = e.id WHERE e.id IS NULL";
+        String orphanCheck = "SELECT COUNT(*) AS orphaned FROM Salaries s LEFT JOIN Employees e ON s.employee_id = e.employee_id WHERE e.employee_id IS NULL";
         //using try to test and display number records imported and any orphaned records
         try (Statement stmt = connection.createStatement()){
             ResultSet rs = stmt.executeQuery(countEmployees);
@@ -119,7 +153,7 @@ return importedCount;
             }
             rs = stmt.executeQuery(orphanCheck);
             if (rs.next()){
-                int orphans= rs.getInt("orphans");
+                int orphans= rs.getInt("orphaned");
                 if (orphans> 0){
                     System.out.println("Warning: There are " + orphans + " salary records without matching employees.");
                 } else {
