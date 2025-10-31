@@ -22,7 +22,7 @@ public class DataImportTool extends JFrame{
 
     private void initializeUI(){
         setTitle("CSV Data Import Tool");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setSize(600,400);
         setLocationRelativeTo(null);
 
