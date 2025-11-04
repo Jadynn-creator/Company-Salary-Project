@@ -32,7 +32,7 @@ public class PayrollAnalysisApp extends JFrame {
         setLocationRelativeTo(null);
         getContentPane().setBackground(BACKGROUND_COLOR);
         
-        public class PayrollAnalysisApp extends JFrame {
+        // This is the code that was misplaced:
         JPanel mainPanel = new JPanel(new BorderLayout(10, 10));
         mainPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         mainPanel.setBackground(BACKGROUND_COLOR);
