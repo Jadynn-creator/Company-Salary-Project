@@ -12,7 +12,7 @@ public class DataAnalyzer {
     private Connection connection;
     private DecimalFormat currencyFormatter = new DecimalFormat("$###,##0.00");
 
-    // This CTE (Common Table Expression) is a reusable SQL snippet.
+    // This Common Table Expression (CTE) is a reusable SQL snippet.
     // It finds the single *most recent* salary for every employee.
     // We use this for all "current" salary calculations.
     private final String LATEST_SALARY_CTE = 
@@ -45,7 +45,7 @@ public class DataAnalyzer {
     }
 
     /**
-     * Task 1: Get average "current" salary per department.
+     * Task : Get average "current" salary per department.
      * (Uses your 'employees.department' and 'salaries.amount')
      */
     public String getAverageSalaryByDepartmentFormatted() throws SQLException {
@@ -73,7 +73,7 @@ public class DataAnalyzer {
     }
 
     /**
-     * Task 2: Get salary trend for a specific employee.
+     * Task : Get salary trend for a specific employee.
      * (Uses your 'salaries' table)
      */
     public String getSalaryTrendFormatted(String employeeId) throws SQLException {
@@ -100,7 +100,7 @@ public class DataAnalyzer {
     }
 
     /**
-     * Task 3a: Get top 5 highest-paid employees based on their "current" salary.
+     * Task : Get top 5 highest-paid employees based on their "current" salary.
      * (Uses 'first_name', 'last_name', and latest 'amount')
      */
     public String getTop5HighestPaidFormatted() throws SQLException {
@@ -131,7 +131,7 @@ public class DataAnalyzer {
     }
 
     /**
-     * Task 3b: Get total "current" payroll cost per department.
+     * Task : Get total "current" payroll cost per department.
      * (Uses 'department' and sums latest 'amount' for all employees in it)
      */
     public String getDepartmentPayrollFormatted() throws SQLException {
