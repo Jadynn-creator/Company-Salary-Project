@@ -186,25 +186,68 @@ public class PayrollAnalysisApp extends JFrame {
     private JButton createStyledButton(String text, Color color) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
-        button.setBackground(color);
-        button.setForeground(Color.WHITE);
+
+        // Ensure background is used by some LAFs
+        button.setContentAreaFilled(true);
+        button.setOpaque(true);
+        button.setBorderPainted(false);
         button.setFocusPainted(false);
-        button.setBorder(BorderFactory.createEmptyBorder(10, 15, 10, 15));
+
+        button.setBackground(color);
+        // Choose readable foreground automatically
+        button.setForeground(getReadableTextColor(color));
+
+        button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button.setMaximumSize(new Dimension(220, 40));
-        
-        // Hover effect
+        button.setPreferredSize(new Dimension(240, 36));
+        button.setMaximumSize(new Dimension(240, 40));
+        button.setMargin(new Insets(6, 10, 6, 10));
+
+        // subtle hover/pressed colors
+        final Color hover = blend(color, Color.black, 0.12f);
+        final Color pressed = blend(color, Color.black, 0.22f);
+
         button.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent evt) {
-                button.setBackground(color.darker());
+                button.setBackground(hover);
+                button.setForeground(getReadableTextColor(hover));
             }
+
             public void mouseExited(MouseEvent evt) {
                 button.setBackground(color);
+                button.setForeground(getReadableTextColor(color));
+            }
+
+            public void mousePressed(MouseEvent evt) {
+                button.setBackground(pressed);
+                button.setForeground(getReadableTextColor(pressed));
+            }
+
+            public void mouseReleased(MouseEvent evt) {
+                // return to hover or default depending on pointer
+                button.setBackground(hover);
+                button.setForeground(getReadableTextColor(hover));
             }
         });
-        
+
         return button;
+    }
+
+    // ----- Button helpers -----
+    private Color getReadableTextColor(Color bg) {
+        double r = bg.getRed() / 255.0;
+        double g = bg.getGreen() / 255.0;
+        double b = bg.getBlue() / 255.0;
+        double luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
+        return luminance < 0.6 ? Color.WHITE : Color.BLACK;
+    }
+
+    private Color blend(Color c1, Color c2, float ratio) {
+        int rr = Math.max(0, Math.min(255, (int) (c1.getRed() * (1 - ratio) + c2.getRed() * ratio)));
+        int gg = Math.max(0, Math.min(255, (int) (c1.getGreen() * (1 - ratio) + c2.getGreen() * ratio)));
+        int bb = Math.max(0, Math.min(255, (int) (c1.getBlue() * (1 - ratio) + c2.getBlue() * ratio)));
+        return new Color(rr, gg, bb);
     }
     
     private void setupEventHandlers() {
