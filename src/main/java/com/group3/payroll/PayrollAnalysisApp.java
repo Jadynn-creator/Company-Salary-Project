@@ -31,7 +31,7 @@ public class PayrollAnalysisApp extends JFrame {
     private void initializeUI() {
         setTitle("Employee Salary Analysis System");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1100, 750);
         setLocationRelativeTo(null);
         getContentPane().setBackground(BACKGROUND_COLOR);
         
@@ -46,12 +46,16 @@ public class PayrollAnalysisApp extends JFrame {
         
         // Create control panel
         JPanel controlPanel = createControlPanel();
-        JScrollPane scrollableControlPanel = new JScrollPane(controlPanel);
-    scrollableControlPanel.setBorder(null);
+
+    JScrollPane scrollableControlPanel = new JScrollPane(controlPanel);
+    scrollableControlPanel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
     scrollableControlPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
     scrollableControlPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-    scrollableControlPanel.getVerticalScrollBar().setUnitIncrement(16); // Smoother scrolling
-    scrollableControlPanel.setPreferredSize(new Dimension(270, 0));
+    scrollableControlPanel.getVerticalScrollBar().setUnitIncrement(16);
+    
+    
+    scrollableControlPanel.setPreferredSize(new Dimension(300, 0));
+    
     mainPanel.add(scrollableControlPanel, BorderLayout.WEST);
         
         // Create result area
@@ -74,88 +78,94 @@ public class PayrollAnalysisApp extends JFrame {
         return headerPanel;
     }
     
-    private JPanel createControlPanel() {
-        JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
-        controlPanel.setBackground(Color.WHITE);
-        controlPanel.setBorder(BorderFactory.createCompoundBorder(
-            new LineBorder(Color.LIGHT_GRAY, 1),
-            BorderFactory.createEmptyBorder(15, 15, 15, 15)
-        ));
-        controlPanel.setPreferredSize(new Dimension(250, 0));
-        
-        // Section title
-        JLabel sectionLabel = new JLabel("Analysis Tools");
-        sectionLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        sectionLabel.setForeground(PRIMARY_COLOR);
-        sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        controlPanel.add(sectionLabel);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-        
-        // Task 1: Average salary per department
-        JButton avgSalaryBtn = createStyledButton("Average Salary by Department");
-        avgSalaryBtn.addActionListener(e -> showAverageSalaryByDepartment());
-        controlPanel.add(avgSalaryBtn);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Task 2: Salary trend
-        JPanel trendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        trendPanel.setBackground(Color.WHITE);
-        trendPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        
-        JLabel trendLabel = new JLabel("Employee Salary Trend:");
-        trendLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-        trendPanel.add(trendLabel);
-        
-        employeeSelector = new JComboBox<>();
-        employeeSelector.setPreferredSize(new Dimension(80, 25));
-        trendPanel.add(employeeSelector);
-        
-        JButton trendBtn = createStyledButton("Show Trend");
-        trendBtn.addActionListener(e -> showSalaryTrend());
-        trendPanel.add(trendBtn);
-        
-        controlPanel.add(trendPanel);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Task 3a: Top 5 highest paid
-        JButton top5Btn = createStyledButton("Top 5 Highest Paid");
-        top5Btn.addActionListener(e -> showTop5HighestPaid());
-        controlPanel.add(top5Btn);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Task 3b: Department payroll
-        JButton deptPayrollBtn = createStyledButton("Department Payroll");
-        deptPayrollBtn.addActionListener(e -> showDepartmentPayroll());
-        controlPanel.add(deptPayrollBtn);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Monthly trend
-        JButton monthlyBtn = createStyledButton("Monthly Payroll Trend");
-        monthlyBtn.addActionListener(e -> showMonthlyTrend());
-        controlPanel.add(monthlyBtn);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Salary distribution
-        JButton distributionBtn = createStyledButton("Salary Distribution");
-        distributionBtn.addActionListener(e -> showSalaryDistribution());
-        controlPanel.add(distributionBtn);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        // Run all analysis
-        JButton allAnalysisBtn = createStyledButton("Run All Analysis", new Color(46, 204, 113));
-        allAnalysisBtn.addActionListener(e -> runAllAnalysis());
-        controlPanel.add(allAnalysisBtn);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+   private JPanel createControlPanel() {
+    JPanel controlPanel = new JPanel();
+    controlPanel.setLayout(new BoxLayout(controlPanel, BoxLayout.Y_AXIS));
+    controlPanel.setBackground(Color.WHITE);
+    controlPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+    
+    
+    controlPanel.setPreferredSize(new Dimension(280, 800));
+    
+    // Section title - Analysis Tools
+    JLabel sectionLabel = new JLabel("Analysis Tools");
+    sectionLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+    sectionLabel.setForeground(PRIMARY_COLOR);
+    sectionLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    controlPanel.add(sectionLabel);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 15)));
+    
+    // Task 1: Average salary per department
+    JButton avgSalaryBtn = createStyledButton("Average Salary by Department");
+    avgSalaryBtn.addActionListener(e -> showAverageSalaryByDepartment());
+    controlPanel.add(avgSalaryBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+    
+    // Task 2: Salary trend
+    JPanel trendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    trendPanel.setBackground(Color.WHITE);
+    trendPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    trendPanel.setMaximumSize(new Dimension(260, 80));
+    
+    JLabel trendLabel = new JLabel("Employee Salary Trend:");
+    trendLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    trendLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    trendPanel.add(trendLabel);
+    trendPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-        //charts
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
-         JLabel chartLabel = new JLabel("Data Visualization");
-        chartLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
-        chartLabel.setForeground(new Color(155, 89, 182));
-        chartLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        controlPanel.add(chartLabel);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    JPanel trendControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    trendControls.setBackground(Color.WHITE);
+    trendControls.setAlignmentX(Component.LEFT_ALIGNMENT);
+    
+    employeeSelector = new JComboBox<>();
+    employeeSelector.setPreferredSize(new Dimension(80, 25));
+    trendPanel.add(employeeSelector);
+    
+    JButton trendBtn = createStyledButton("Show Trend");
+    trendBtn.setPreferredSize(new Dimension(100, 25));
+    trendBtn.setFont(new Font("Segoe UI", Font.BOLD, 10));
+    trendPanel.add(trendBtn);
+    
+    controlPanel.add(trendPanel);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+    // Task 3a: Top 5 highest paid
+    JButton top5Btn = createStyledButton("Top 5 Highest Paid");
+    top5Btn.addActionListener(e -> showTop5HighestPaid());
+    controlPanel.add(top5Btn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+    // Task 3b: Department payroll
+    JButton deptPayrollBtn = createStyledButton("Department Payroll");
+    deptPayrollBtn.addActionListener(e -> showDepartmentPayroll());
+    controlPanel.add(deptPayrollBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+    // Monthly trend
+    JButton monthlyBtn = createStyledButton("Monthly Payroll Trend");
+    monthlyBtn.addActionListener(e -> showMonthlyTrend());
+    controlPanel.add(monthlyBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+    // Salary distribution
+    JButton distributionBtn = createStyledButton("Salary Distribution");
+    distributionBtn.addActionListener(e -> showSalaryDistribution());
+    controlPanel.add(distributionBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+    // Run all analysis
+    JButton allAnalysisBtn = createStyledButton("Run All Analysis", new Color(46, 204, 113));
+    allAnalysisBtn.addActionListener(e -> runAllAnalysis());
+    controlPanel.add(allAnalysisBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+    // Charts section
+    JLabel chartLabel = new JLabel("Data Visualization");
+    chartLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+    chartLabel.setForeground(new Color(155, 89, 182));
+    chartLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    controlPanel.add(chartLabel);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
 
     // Chart buttons
     JButton lineChartBtn = createStyledButton("Monthly Payroll Trend", new Color(155, 89, 182));
@@ -183,22 +193,24 @@ public class PayrollAnalysisApp extends JFrame {
     controlPanel.add(pieChartBtn);
     controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
 
+    // Data management section
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+    JLabel dataLabel = new JLabel("Data Management");
+    dataLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
+    dataLabel.setForeground(PRIMARY_COLOR);
+    dataLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+    controlPanel.add(dataLabel);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    
+    JButton importDataBtn = createStyledButton("Import Data Tool", new Color(155, 89, 182));
+    importDataBtn.addActionListener(e -> openDataImportTool());
+    controlPanel.add(importDataBtn);
+    
 
-        
-        // Data management section
-        JLabel dataLabel = new JLabel("Data Management");
-        dataLabel.setFont(new Font("Segoe UI", Font.BOLD, 14));
-        dataLabel.setForeground(PRIMARY_COLOR);
-        dataLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
-        controlPanel.add(dataLabel);
-        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
-        
-        JButton importDataBtn = createStyledButton("Import Data Tool", new Color(155, 89, 182));
-        importDataBtn.addActionListener(e -> openDataImportTool());
-        controlPanel.add(importDataBtn);
-        
-        return controlPanel;
-    }
+    controlPanel.add(Box.createVerticalGlue());
+    
+    return controlPanel;
+}
     //chart methods
     private void showLineChart() {
         if (chartGenerator == null) {
@@ -270,13 +282,10 @@ public class PayrollAnalysisApp extends JFrame {
     private JButton createStyledButton(String text, Color color) {
         JButton button = new JButton(text);
         button.setFont(new Font("Segoe UI", Font.BOLD, 12));
-
-        // Ensure background is used by some LAFs
         button.setContentAreaFilled(true);
         button.setOpaque(true);
         button.setBorderPainted(false);
         button.setFocusPainted(false);
-
         button.setBackground(color);
         // Choose readable foreground automatically
         button.setForeground(getReadableTextColor(color));
@@ -284,8 +293,9 @@ public class PayrollAnalysisApp extends JFrame {
         button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button.setPreferredSize(new Dimension(240, 36));
-        button.setMaximumSize(new Dimension(240, 40));
+        button.setPreferredSize(new Dimension(260, 35));
+        button.setMaximumSize(new Dimension(260, 35));
+        button.setMinimumSize(new Dimension(260, 35));
         button.setMargin(new Insets(6, 10, 6, 10));
 
         // subtle hover/pressed colors
