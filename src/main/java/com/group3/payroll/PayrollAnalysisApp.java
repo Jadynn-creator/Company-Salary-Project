@@ -7,12 +7,15 @@ import java.awt.event.*;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import org.knowm.xchart.*;
+import org.knowm.xchart.internal.chartpart.Chart;
 
 public class PayrollAnalysisApp extends JFrame {
     private Connection connection;
     private DataAnalyzer dataAnalyzer;
     private JTextArea resultArea;
     private JComboBox<String> employeeSelector;
+    private ChartGenerator chartGenerator;
     
     // Colors for better UI
     private final Color PRIMARY_COLOR = new Color(41, 128, 185);
@@ -138,6 +141,43 @@ public class PayrollAnalysisApp extends JFrame {
         allAnalysisBtn.addActionListener(e -> runAllAnalysis());
         controlPanel.add(allAnalysisBtn);
         controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+
+        //charts
+        controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+         JLabel chartLabel = new JLabel("Data Visualization");
+        chartLabel.setFont(new Font("Segoe UI", Font.BOLD, 16));
+        chartLabel.setForeground(new Color(155, 89, 182));
+        chartLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
+        controlPanel.add(chartLabel);
+        controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+
+    // Chart buttons
+    JButton lineChartBtn = createStyledButton("Monthly Payroll Trend", new Color(155, 89, 182));
+    lineChartBtn.addActionListener(e -> showLineChart());
+    controlPanel.add(lineChartBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+
+    JButton barChartBtn = createStyledButton("Avg Salary by Dept", new Color(155, 89, 182));
+    barChartBtn.addActionListener(e -> showBarChart());
+    controlPanel.add(barChartBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+    
+    JButton distChartBtn = createStyledButton("Salary Distribution", new Color(155, 89, 182));
+    distChartBtn.addActionListener(e -> showDistributionChart());
+    controlPanel.add(distChartBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+    
+    JButton deptPayrollChartBtn = createStyledButton("Dept Payroll Comparison", new Color(155, 89, 182));
+    deptPayrollChartBtn.addActionListener(e -> showDepartmentPayrollChart());
+    controlPanel.add(deptPayrollChartBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+    
+    JButton pieChartBtn = createStyledButton("Dept Distribution", new Color(155, 89, 182));
+    pieChartBtn.addActionListener(e -> showPieChart());
+    controlPanel.add(pieChartBtn);
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+
+
         
         // Data management section
         JLabel dataLabel = new JLabel("Data Management");
@@ -153,7 +193,45 @@ public class PayrollAnalysisApp extends JFrame {
         
         return controlPanel;
     }
-    
+    //chart methods
+    private void showLineChart() {
+        if (chartGenerator != null) {
+            showError("Chart generator not initialized");
+            return;
+        }
+        chartGenerator.monthlyPayrollLineChart();
+    }
+
+    private void showBarChart() {
+        if (chartGenerator != null) {
+            showError("Chart generator not initialized");
+            return;
+        }
+        chartGenerator.averageSalaryBarChart();
+    }
+    private void showDistributionChart() {
+        if (chartGenerator != null) {
+            showError("Chart generator not initialized");
+            return;
+        }
+        chartGenerator.salaryHistogramChart();
+    }
+    private void showDepartmentPayrollChart() {
+        if (chartGenerator != null) {
+            showError("Chart generator not initialized");
+            return;
+        }
+        chartGenerator.departmentPayrollBarChart();
+
+    }
+    private void showPieChart() {
+        if (chartGenerator != null) {
+            showError("Chart generator not initialized");
+            return;
+        }
+        chartGenerator.employeeDistributionPieChart();
+    }
+
     private JPanel createResultPanel() {
         JPanel resultPanel = new JPanel(new BorderLayout());
         resultPanel.setBackground(Color.WHITE);
@@ -221,7 +299,9 @@ public class PayrollAnalysisApp extends JFrame {
         try {
             connection = DatabaseConnection.getConnection();
             dataAnalyzer = new DataAnalyzer(connection);
+            chartGenerator = new ChartGenerator(connection);
             loadEmployeeList();
+
             showMessage("Database connected successfully!\nReady to run analysis.");
         } catch (Exception ex) {
             showError("Database connection failed: " + ex.getMessage());

@@ -1,5 +1,5 @@
 package main.java.com.group3.payroll;
-//import necessary libraries
+//import  libraries
 import java.sql.*;
 import java.util.*;
 import java.io.*;
