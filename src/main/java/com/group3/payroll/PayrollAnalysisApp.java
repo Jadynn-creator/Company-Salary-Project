@@ -46,7 +46,13 @@ public class PayrollAnalysisApp extends JFrame {
         
         // Create control panel
         JPanel controlPanel = createControlPanel();
-        mainPanel.add(controlPanel, BorderLayout.WEST);
+        JScrollPane scrollableControlPanel = new JScrollPane(controlPanel);
+    scrollableControlPanel.setBorder(null);
+    scrollableControlPanel.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+    scrollableControlPanel.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scrollableControlPanel.getVerticalScrollBar().setUnitIncrement(16); // Smoother scrolling
+    scrollableControlPanel.setPreferredSize(new Dimension(270, 0));
+    mainPanel.add(scrollableControlPanel, BorderLayout.WEST);
         
         // Create result area
         JPanel resultPanel = createResultPanel();
@@ -195,7 +201,7 @@ public class PayrollAnalysisApp extends JFrame {
     }
     //chart methods
     private void showLineChart() {
-        if (chartGenerator != null) {
+        if (chartGenerator == null) {
             showError("Chart generator not initialized");
             return;
         }
@@ -203,21 +209,21 @@ public class PayrollAnalysisApp extends JFrame {
     }
 
     private void showBarChart() {
-        if (chartGenerator != null) {
+        if (chartGenerator == null) {
             showError("Chart generator not initialized");
             return;
         }
         chartGenerator.averageSalaryBarChart();
     }
     private void showDistributionChart() {
-        if (chartGenerator != null) {
+        if (chartGenerator == null) {
             showError("Chart generator not initialized");
             return;
         }
         chartGenerator.salaryHistogramChart();
     }
     private void showDepartmentPayrollChart() {
-        if (chartGenerator != null) {
+        if (chartGenerator == null) {
             showError("Chart generator not initialized");
             return;
         }
@@ -225,7 +231,7 @@ public class PayrollAnalysisApp extends JFrame {
 
     }
     private void showPieChart() {
-        if (chartGenerator != null) {
+        if (chartGenerator == null) {
             showError("Chart generator not initialized");
             return;
         }
