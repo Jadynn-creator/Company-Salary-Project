@@ -30,6 +30,7 @@ Thumbs.db
 
 #configure files
 configure.properties.template
+configure.properties
 
 # BlueJ files
 *.ctxt
