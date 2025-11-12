@@ -176,7 +176,7 @@ public class ChartGenerator {
             Histogram histogram = new Histogram(salaries, 10);
 
             CategoryChart chart = new CategoryChartBuilder()
-                    .width(800)
+                    .width(1150)
                     .height(500)
                     .title("Salary Distribution")
                     .xAxisTitle("Salary Range")
