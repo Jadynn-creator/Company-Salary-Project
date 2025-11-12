@@ -118,12 +118,13 @@ public class PayrollAnalysisApp extends JFrame {
     trendControls.setAlignmentX(Component.LEFT_ALIGNMENT);
     
     employeeSelector = new JComboBox<>();
-    employeeSelector.setPreferredSize(new Dimension(80, 25));
+    employeeSelector.setPreferredSize(new Dimension(50, 15));
     trendPanel.add(employeeSelector);
     
-    JButton trendBtn = createStyledButton("Show Trend");
-    trendBtn.setPreferredSize(new Dimension(100, 25));
-    trendBtn.setFont(new Font("Segoe UI", Font.BOLD, 10));
+    JButton trendBtn = createStyledButton("Show ");
+    trendBtn.setPreferredSize(new Dimension(60, 16));
+    trendBtn.setFont(new Font("Segoe UI", Font.BOLD,10));
+    trendBtn.addActionListener(e -> showSalaryTrend());
     trendPanel.add(trendBtn);
     
     controlPanel.add(trendPanel);
