@@ -42,7 +42,7 @@ public class ChartGenerator {
                     .height(500)
                     .title("Monthly Payroll Trend")
                     .xAxisTitle("Month")
-                    .yAxisTitle("Total Payroll")
+                    .yAxisTitle("Total Payroll x 10^6")
                     .build();
             
             chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
@@ -55,7 +55,11 @@ public class ChartGenerator {
             for (int i = 0; i < months.size(); i++) {
                 xData.add(i + 1);
             }
-            XYSeries series = chart.addSeries("Total Payroll", xData, payrolls);
+            List<Double> payrollsInMillions = new ArrayList<>();
+            for (Double payroll : payrolls) {
+                payrollsInMillions.add(payroll / 1_000_000);
+            }
+            XYSeries series = chart.addSeries("Total Payroll", xData, payrollsInMillions);
 
             series.setMarker(SeriesMarkers.CIRCLE);
             series.setLineColor(new Color(41,128,185));
@@ -139,7 +143,7 @@ public class ChartGenerator {
                     .height(500)
                     .title("Department Payroll Comparison")
                     .xAxisTitle("Department")
-                    .yAxisTitle("Total Payroll")
+                    .yAxisTitle("Total Payroll x 10^6")
                     .build();
 
             chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
@@ -147,7 +151,12 @@ public class ChartGenerator {
             chart.getStyler().setPlotBackgroundColor(Color.white);
             chart.getStyler().setPlotGridLinesColor(Color.LIGHT_GRAY);
 
-            chart.addSeries("Total Payroll", departments, totalPayrolls)
+            List<Double> totalPayrollsInMillions = new ArrayList<>();
+            for (Double payroll : totalPayrolls) {
+                totalPayrollsInMillions.add(payroll / 1_000_000);
+            }
+
+            chart.addSeries("Total Payroll", departments, totalPayrollsInMillions)
                     .setFillColor(new Color(41,128,185));
 
             showChart(chart, "Total Payroll by Department");
