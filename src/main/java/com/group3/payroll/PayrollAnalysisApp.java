@@ -14,7 +14,7 @@ public class PayrollAnalysisApp extends JFrame {
     private Connection connection;
     private DataAnalyzer dataAnalyzer;
     private JTextArea resultArea;
-    private JComboBox<String> employeeSelector;
+    private JComboBox<EmployeeItem> employeeSelector;
     private ChartGenerator chartGenerator;
     
     // Colors for better UI
@@ -85,7 +85,9 @@ public class PayrollAnalysisApp extends JFrame {
     controlPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
     
     
-    controlPanel.setPreferredSize(new Dimension(280, 800));
+    // Shrink the left control panel further so the trend controls are visible
+    // even on small screens and narrow windows.
+    controlPanel.setPreferredSize(new Dimension(150, 250));
     
     // Section title - Analysis Tools
     JLabel sectionLabel = new JLabel("Analysis Tools");
@@ -99,7 +101,7 @@ public class PayrollAnalysisApp extends JFrame {
     JButton avgSalaryBtn = createStyledButton("Average Salary by Department");
     avgSalaryBtn.addActionListener(e -> showAverageSalaryByDepartment());
     controlPanel.add(avgSalaryBtn);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 8)));
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 16)));
     
     // Task 2: Salary trend
     JPanel trendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
@@ -108,51 +110,59 @@ public class PayrollAnalysisApp extends JFrame {
     trendPanel.setMaximumSize(new Dimension(260, 80));
     
     JLabel trendLabel = new JLabel("Employee Salary Trend:");
-    trendLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+    trendLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
     trendLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     trendPanel.add(trendLabel);
     trendPanel.add(Box.createRigidArea(new Dimension(0, 5)));
 
-    JPanel trendControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 5, 0));
+    JPanel trendControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
     trendControls.setBackground(Color.WHITE);
     trendControls.setAlignmentX(Component.LEFT_ALIGNMENT);
-    
+
     employeeSelector = new JComboBox<>();
-    employeeSelector.setPreferredSize(new Dimension(50, 15));
-    trendPanel.add(employeeSelector);
-    
-    JButton trendBtn = createStyledButton("Show ");
-    trendBtn.setPreferredSize(new Dimension(60, 16));
-    trendBtn.setFont(new Font("Segoe UI", Font.BOLD,10));
+    employeeSelector.setPrototypeDisplayValue(new EmployeeItem("XXXXXXXX","Firstname Lastname"));
+    // Make selector very compact so it fits comfortably in tight layouts
+    employeeSelector.setPreferredSize(new Dimension(180,25));
+    employeeSelector.setMaximumSize(new Dimension(180, 25));
+
+    JButton trendBtn = createStyledButton("Show");
+    // Make the trend button smaller to avoid layout overflow
+    trendBtn.setPreferredSize(new Dimension(65, 25));
+    trendBtn.setMaximumSize(new Dimension(65, 25));
+    trendBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
     trendBtn.addActionListener(e -> showSalaryTrend());
-    trendPanel.add(trendBtn);
+
+    // Put selector and button into the trendControls panel so sizes are respected
+    trendControls.add(employeeSelector);
+    trendControls.add(trendBtn);
+    trendPanel.add(trendControls);
     
     controlPanel.add(trendPanel);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
     
     // Task 3a: Top 5 highest paid
     JButton top5Btn = createStyledButton("Top 5 Highest Paid");
     top5Btn.addActionListener(e -> showTop5HighestPaid());
     controlPanel.add(top5Btn);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 12)));
     
     // Task 3b: Department payroll
     JButton deptPayrollBtn = createStyledButton("Department Payroll");
     deptPayrollBtn.addActionListener(e -> showDepartmentPayroll());
     controlPanel.add(deptPayrollBtn);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 12)));
     
     // Monthly trend
     JButton monthlyBtn = createStyledButton("Monthly Payroll Trend");
     monthlyBtn.addActionListener(e -> showMonthlyTrend());
     controlPanel.add(monthlyBtn);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 12)));
     
     // Salary distribution
     JButton distributionBtn = createStyledButton("Salary Distribution");
     distributionBtn.addActionListener(e -> showSalaryDistribution());
     controlPanel.add(distributionBtn);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 10)));
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 12)));
     
     // Run all analysis
     JButton allAnalysisBtn = createStyledButton("Run All Analysis", new Color(46, 204, 113));
@@ -370,14 +380,14 @@ public class PayrollAnalysisApp extends JFrame {
     
     private void loadEmployeeList() {
         try {
-            java.util.List<String> employeeIds = dataAnalyzer.getAllEmployeeIds();
+            java.util.Map<String,String> employees = dataAnalyzer.getAllEmployees();
             employeeSelector.removeAllItems();
-            
-            for (String id : employeeIds) {
-                employeeSelector.addItem(id);
+
+            for (java.util.Map.Entry<String,String> e : employees.entrySet()) {
+                employeeSelector.addItem(new EmployeeItem(e.getKey(), e.getValue()));
             }
-            
-            if (!employeeIds.isEmpty()) {
+
+            if (!employees.isEmpty()) {
                 employeeSelector.setSelectedIndex(0);
             }
         } catch (Exception ex) {
@@ -397,16 +407,23 @@ public class PayrollAnalysisApp extends JFrame {
     }
     
     private void showSalaryTrend() {
-        String selectedEmployee = (String) employeeSelector.getSelectedItem();
-        if (selectedEmployee == null) {
+        EmployeeItem selected = (EmployeeItem) employeeSelector.getSelectedItem();
+        if (selected == null) {
             showError("Please select an employee first");
             return;
         }
-        
+
+        String selectedId = selected.getId();
+        String selectedName = selected.getName();
+
         try {
-            String result = dataAnalyzer.getSalaryTrendFormatted(selectedEmployee);
-            showMessage("SALARY TREND FOR EMPLOYEE: " + selectedEmployee + "\n" +
-                       "===================================\n" + result);
+            String result = dataAnalyzer.getSalaryTrendFormatted(selectedId);
+            if (result == null || result.trim().isEmpty() || result.contains("No payroll history")) {
+                showMessage("No salary trend found for " + selectedId + " - " + selectedName);
+            } else {
+                showMessage("SALARY TREND FOR: " + selectedId + " - " + selectedName + "\n" +
+                           "===================================\n" + result);
+            }
         } catch (Exception ex) {
             showError("Error analyzing salary trend: " + ex.getMessage());
         }
@@ -491,6 +508,23 @@ public class PayrollAnalysisApp extends JFrame {
         } catch (SQLException ex) {
             System.err.println("Error closing database connection: " + ex.getMessage());
         }
+    }
+
+    // Simple holder to display id + name in the combo box while keeping id accessible
+    private static class EmployeeItem {
+        private final String id;
+        private final String name;
+
+        EmployeeItem(String id, String name) {
+            this.id = id;
+            this.name = name == null ? "" : name;
+        }
+
+        String getId() { return id; }
+        String getName() { return name; }
+
+        @Override
+        public String toString() { return id + " - " + name; }
     }
     
     public static void main(String[] args) {
