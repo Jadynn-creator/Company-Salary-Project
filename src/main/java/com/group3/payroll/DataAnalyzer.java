@@ -66,6 +66,14 @@ public class DataAnalyzer {
     }
 
     /**
+     * Backwards-compatible alias used by UI code.
+     * Returns employee ID -> full name map.
+     */
+    public Map<String, String> getAllEmployees() throws SQLException {
+        return getEmployeeIdNameMap();
+    }
+
+    /**
      * Task : Get average MOST CURRENT salary per department.
      * (Uses your 'employees.department' and 'salaries.amount')
      */
@@ -126,7 +134,7 @@ public class DataAnalyzer {
      */
     public String getTop5HighestPaidFormatted() throws SQLException {
         StringBuilder sb = new StringBuilder();
-        // This query joins employees with their *latest* salary,
+        // This query joins employees with their MOST CURRENT salary,
         // then orders by that salary amount.
         String sql = LATEST_SALARY_CTE +
                      "SELECT e.first_name, e.last_name, ls.amount " +
@@ -152,17 +160,17 @@ public class DataAnalyzer {
     }
 
     /**
-     * Task : Get total "current" payroll cost per department.
+     * Task : Get total CURRENT payroll cost per department.
      * (Uses 'department' and sums latest 'amount' for all employees in it)
      */
     public String getDepartmentPayrollFormatted() throws SQLException {
         StringBuilder sb = new StringBuilder();
-        // This query sums the *latest* salaries for all employees, grouped by department.
+        // This query sums the MOST CURRENT salaries for all employees, grouped by department.
         String sql = LATEST_SALARY_CTE +
                      "SELECT e.department, SUM(ls.amount) as total_payroll " +
                      "FROM employees e " +
                      "JOIN LatestSalary ls ON e.employee_id = ls.employee_id " +
-                     "WHERE ls.rn = 1 " + // Filter for only the latest salary
+                     "WHERE ls.rn = 1 " + // Filter for only the MOST CURRENT salary
                      "GROUP BY e.department " +
                      "ORDER BY total_payroll DESC";
 
