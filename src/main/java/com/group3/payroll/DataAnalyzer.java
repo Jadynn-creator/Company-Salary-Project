@@ -7,13 +7,15 @@ import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DataAnalyzer {
     private Connection connection;
     private DecimalFormat currencyFormatter = new DecimalFormat("$###,##0.00");
 
     // This Common Table Expression (CTE) is a reusable SQL snippet.
-    // It finds the single *most recent* salary for every employee.
+    // It finds the single MOST RECENT salary for every employee.
     // We use this for all "current" salary calculations.
     private final String LATEST_SALARY_CTE = 
         "WITH LatestSalary AS ( " +
@@ -43,9 +45,28 @@ public class DataAnalyzer {
         }
         return employeeIds;
     }
+    /**
+     * Returns a map of employee IDs to their full names. Used for dropdowns.
+     * Uses LinkedHashMap to preserve insertion order.
+     */
+    public Map<String, String> getEmployeeIdNameMap() throws SQLException {
+        Map<String, String> employeeMap = new LinkedHashMap<>();
+        String sql = "SELECT employee_id, first_name, last_name FROM employees ORDER BY employee_id";
+
+        try (PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                String employeeId = rs.getString("employee_id");
+                String fullName = rs.getString("first_name") + " " + rs.getString("last_name");
+                employeeMap.put(employeeId, fullName);
+            }
+        }
+        return employeeMap;
+    }
 
     /**
-     * Task : Get average "current" salary per department.
+     * Task : Get average MOST CURRENT salary per department.
      * (Uses your 'employees.department' and 'salaries.amount')
      */
     public String getAverageSalaryByDepartmentFormatted() throws SQLException {
@@ -182,13 +203,13 @@ public class DataAnalyzer {
     }
 
     /**
-     * Get the distribution of "current" salaries in buckets.
-     * (Uses latest 'amount' for all employees)
+     * Get the distribution of MOST CURRENT salaries in buckets.
+     * (Uses MOST CURRENT for all employees)
      */
     public String getSalaryDistributionFormatted() throws SQLException {
         StringBuilder sb = new StringBuilder();
-        // This query uses the *latest* salary for each employee
-        // and buckets them into ranges.
+        // This query uses the MOST CURRENT salary for each employee
+        // and funnels them into ranges.
         String sql = LATEST_SALARY_CTE +
                      "SELECT " +
                      "  CASE " +
@@ -200,9 +221,9 @@ public class DataAnalyzer {
                      "  END as salary_range, " +
                      "  COUNT(*) as employee_count " +
                      "FROM LatestSalary ls " +
-                     "WHERE ls.rn = 1 " + // Filter for only the latest salary
+                     "WHERE ls.rn = 1 " + // Filter for only the MOST CURRENT salary
                      "GROUP BY salary_range " +
-                     "ORDER BY " + // Custom order to get ranges to display logically
+                     "ORDER BY " + // Custom order to get ranges to display data logically
                      "  CASE " +
                      "    WHEN salary_range = '< $50,000' THEN 1 " +
                      "    WHEN salary_range = '$50,000 - $74,999' THEN 2 " +
