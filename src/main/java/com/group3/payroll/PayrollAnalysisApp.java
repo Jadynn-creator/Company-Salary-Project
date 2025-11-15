@@ -54,7 +54,10 @@ public class PayrollAnalysisApp extends JFrame {
     scrollableControlPanel.getVerticalScrollBar().setUnitIncrement(16);
     
     
-    scrollableControlPanel.setPreferredSize(new Dimension(300, 0));
+    // Give the scroll pane a sensible preferred height so the left panel is
+    // visible and can scroll when its content is taller than the viewport.
+    scrollableControlPanel.setPreferredSize(new Dimension(300, 650));
+    scrollableControlPanel.setMinimumSize(new Dimension(220, 200));
     
     mainPanel.add(scrollableControlPanel, BorderLayout.WEST);
         
@@ -85,9 +88,8 @@ public class PayrollAnalysisApp extends JFrame {
     controlPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
     
     
-    // Shrink the left control panel further so the trend controls are visible
-    // even on small screens and narrow windows.
-    controlPanel.setPreferredSize(new Dimension(150, 250));
+    // Let the control panel's preferred height be determined by its content
+    // so the scroll pane will show scroll bars when controls overflow vertically.
     
     // Section title - Analysis Tools
     JLabel sectionLabel = new JLabel("Analysis Tools");
@@ -104,16 +106,18 @@ public class PayrollAnalysisApp extends JFrame {
     controlPanel.add(Box.createRigidArea(new Dimension(0, 16)));
     
     // Task 2: Salary trend
-    JPanel trendPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+    // Stack the label above the controls so the selector and button are
+    // always visible and not pushed to the far right by layout quirks.
+    JPanel trendPanel = new JPanel();
+    trendPanel.setLayout(new BoxLayout(trendPanel, BoxLayout.Y_AXIS));
     trendPanel.setBackground(Color.WHITE);
     trendPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
-    trendPanel.setMaximumSize(new Dimension(260, 80));
-    
+
     JLabel trendLabel = new JLabel("Employee Salary Trend:");
-    trendLabel.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+    trendLabel.setFont(new Font("Segoe UI", Font.PLAIN, 12));
     trendLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
     trendPanel.add(trendLabel);
-    trendPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+    trendPanel.add(Box.createRigidArea(new Dimension(0, 6)));
 
     JPanel trendControls = new JPanel(new FlowLayout(FlowLayout.LEFT, 8, 0));
     trendControls.setBackground(Color.WHITE);
@@ -121,14 +125,15 @@ public class PayrollAnalysisApp extends JFrame {
 
     employeeSelector = new JComboBox<>();
     employeeSelector.setPrototypeDisplayValue(new EmployeeItem("XXXXXXXX","Firstname Lastname"));
-    // Make selector very compact so it fits comfortably in tight layouts
-    employeeSelector.setPreferredSize(new Dimension(180,25));
-    employeeSelector.setMaximumSize(new Dimension(180, 25));
+    // Increase selector size for visibility
+    employeeSelector.setPreferredSize(new Dimension(190, 28));
+    employeeSelector.setMaximumSize(new Dimension(190, 28));
+    employeeSelector.setMinimumSize(new Dimension(160, 24));
 
     JButton trendBtn = createStyledButton("Show");
-    // Make the trend button smaller to avoid layout overflow
-    trendBtn.setPreferredSize(new Dimension(65, 25));
-    trendBtn.setMaximumSize(new Dimension(65, 25));
+    // Size the trend button to match selector height
+    trendBtn.setPreferredSize(new Dimension(55, 28));
+    trendBtn.setMaximumSize(new Dimension(55, 28));
     trendBtn.setFont(new Font("Segoe UI", Font.BOLD, 12));
     trendBtn.addActionListener(e -> showSalaryTrend());
 
@@ -138,7 +143,9 @@ public class PayrollAnalysisApp extends JFrame {
     trendPanel.add(trendControls);
     
     controlPanel.add(trendPanel);
-    controlPanel.add(Box.createRigidArea(new Dimension(0, 20)));
+    // Add extra vertical space after the trend controls so they remain
+    // clearly visible and the rest of the buttons are pushed further down.
+    controlPanel.add(Box.createRigidArea(new Dimension(0, 80)));
     
     // Task 3a: Top 5 highest paid
     JButton top5Btn = createStyledButton("Top 5 Highest Paid");
@@ -304,9 +311,11 @@ public class PayrollAnalysisApp extends JFrame {
         button.setBorder(BorderFactory.createEmptyBorder(8, 12, 8, 12));
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
-        button.setPreferredSize(new Dimension(260, 35));
-        button.setMaximumSize(new Dimension(260, 35));
-        button.setMinimumSize(new Dimension(260, 35));
+        // Reduce default button width so the left pane fits more controls
+        // and keeps the employee trend selector visible.
+        button.setPreferredSize(new Dimension(200, 30));
+        button.setMaximumSize(new Dimension(200, 30));
+        button.setMinimumSize(new Dimension(160, 26));
         button.setMargin(new Insets(6, 10, 6, 10));
 
         // subtle hover/pressed colors
