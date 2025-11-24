@@ -112,7 +112,7 @@ return importedCount;
         tokens.add(field.toString());
         return tokens.toArray(new String[0]);
     }
-    // Parse date from string in format YYYY-MM-DD
+    // Parse date from string in format YYYY-MM-DD since that is the format we expect
     private java.sql.Date parseDate(String dateStr){
         try {
            if (dateStr.contains("-")){

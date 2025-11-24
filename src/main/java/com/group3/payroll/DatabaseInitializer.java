@@ -5,11 +5,12 @@ import java.sql.*;
 import java.io.*;
 import java.util.Properties;
 
+// Class to initialize and set up the database
 public class DatabaseInitializer {
     
     public static void setupDatabase() {
         System.out.println("Starting database setup...");
-        
+        // Try block to handle exceptions that were not previously caught
         try {
             
             createDatabaseIfNotExists();
@@ -33,11 +34,12 @@ public class DatabaseInitializer {
         }
     }
     
+    // Create database if it does not exist
     private static void createDatabaseIfNotExists() throws SQLException, IOException {
         String baseUrl = "jdbc:mysql://localhost:3306/";
         String username = getDBUsername();
         String password = getDBPassword();
-        
+        // Connect to MySQL server without specifying a database
         try (Connection conn = DriverManager.getConnection(baseUrl, username, password);
              Statement stmt = conn.createStatement()) {
             
@@ -55,6 +57,7 @@ public class DatabaseInitializer {
         }
     }
     
+    // Create necessary tables if they do not exist
     private static void createTablesIfNotExist(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement()) {
             
@@ -89,6 +92,7 @@ public class DatabaseInitializer {
             System.out.println("Indexes created");
         }
     }
+    // Helper method to create indexes safely since errors were encountered previously
      private static void createIndexSafely(Statement stmt, String indexName, String createIndexSQL) {
         try {
             stmt.execute(createIndexSQL);
@@ -101,7 +105,8 @@ public class DatabaseInitializer {
             }
         }
     }
-    
+
+    // Verify that the database and tables are set up correctly
     private static void verifyDatabaseSetup(Connection conn) throws SQLException {
         try (Statement stmt = conn.createStatement()) {
             // Check if tables exist
@@ -124,7 +129,7 @@ public class DatabaseInitializer {
             }
         }
     }
-    
+    // Methods to read DB credentials from properties file
     private static String getDBUsername() throws IOException {
         Properties props = new Properties();
         try (InputStream input = new FileInputStream("configure.properties")) {

@@ -12,9 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ChartGenerator {
-
+    //database connection
     private Connection connection;
-
+   
     public ChartGenerator(Connection connection) {
         this.connection = connection;}
 
@@ -22,12 +22,13 @@ public class ChartGenerator {
     //Monthly payroll line chart    
 
     public void monthlyPayrollLineChart(){
+        //data retrieval
         try{
             List<String> months = new ArrayList<>();
             List<Double> payrolls = new ArrayList<>();
 
             String sql ="SELECT month, SUM(amount) as total_payroll FROM Salaries GROUP BY month ORDER BY month";
-
+            //adding records to lists
             try(Statement stmt = connection.createStatement();
                 ResultSet rs = stmt.executeQuery (sql)){
                 while (rs.next()){
@@ -44,7 +45,7 @@ public class ChartGenerator {
                     .xAxisTitle("Month")
                     .yAxisTitle("Total Payroll x 10^6")
                     .build();
-            
+            //styling
             chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
             chart.getStyler().setDefaultSeriesRenderStyle(XYSeries.XYSeriesRenderStyle.Line);
             chart.getStyler().setChartBackgroundColor(Color.WHITE);
@@ -55,12 +56,13 @@ public class ChartGenerator {
             for (int i = 0; i < months.size(); i++) {
                 xData.add(i + 1);
             }
+            // Convert payrolls to millions for better readability
             List<Double> payrollsInMillions = new ArrayList<>();
             for (Double payroll : payrolls) {
                 payrollsInMillions.add(payroll / 1_000_000);
             }
             XYSeries series = chart.addSeries("Total Payroll", xData, payrollsInMillions);
-
+            //customizing series
             series.setMarker(SeriesMarkers.CIRCLE);
             series.setLineColor(new Color(41,128,185));
             series.setMarkerColor(new Color(52,152,219));
@@ -191,13 +193,13 @@ public class ChartGenerator {
                     .xAxisTitle("Salary Range")
                     .yAxisTitle("Number of Employees")
                     .build();
-
+            //styling
             chart.getStyler().setLegendPosition(Styler.LegendPosition.InsideNE);
             chart.getStyler().setChartBackgroundColor(Color.WHITE);
             chart.getStyler().setPlotBackgroundColor(Color.white);
             chart.getStyler().setPlotGridLinesColor(Color.LIGHT_GRAY);
 
-            //bin creation
+            //bin creation and adding to chart
             List<Double> binCounts = new ArrayList<>();
             List<String> binLabels = new ArrayList<>();
 
@@ -275,7 +277,7 @@ public class ChartGenerator {
             showError("Error generating employee distribution pie chart: " + e.getMessage());
         }
     }
-
+    //method to display chart in dialog
      private void showChart(Chart<?, ?> chart, String title) {
         SwingUtilities.invokeLater(() -> {
             JDialog chartDialog = new JDialog();
@@ -291,6 +293,7 @@ public class ChartGenerator {
             chartDialog.setVisible(true);
         });
     }
+    //method to show error messages
     private void showError(String message) {
         SwingUtilities.invokeLater(() -> 
             JOptionPane.showMessageDialog(null, message, "Error", JOptionPane.ERROR_MESSAGE)

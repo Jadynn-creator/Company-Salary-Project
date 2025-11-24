@@ -9,6 +9,7 @@ import java.awt.event.ActionListener;
 import java.sql.Connection;
 import java.io.File;
 
+//main class for the data import tool
 public class DataImportTool extends JFrame{
     private JTextArea logArea;
     private JButton importEmployees,importSalaries,initializeDB;
@@ -19,6 +20,8 @@ public class DataImportTool extends JFrame{
     initializeUI();
     setupEventHandlers();
     }
+
+    //UI setup
 
     private void initializeUI(){
         setTitle("CSV Data Import Tool");
@@ -68,6 +71,7 @@ public class DataImportTool extends JFrame{
         ex.printStackTrace();
     }
 }
+// Method to import employees from a CSV file
     private void importEmployees(){
         if (connection == null){
             log("Please initialize the database first.\n");
@@ -91,6 +95,7 @@ public class DataImportTool extends JFrame{
             }
         }
     }
+    // Method to import salaries from a CSV file
     private void importSalaries(){
         if (connection == null){
             log("Please initialize the database first.\n");
@@ -115,12 +120,14 @@ public class DataImportTool extends JFrame{
         }
     }
 
+    //logging method
     private void log(String message){
         SwingUtilities.invokeLater(() -> {
             logArea.append("["+ new java.util.Date() +"] " + message+"\n");
             logArea.setCaretPosition(logArea.getDocument().getLength());
         } );
     }
+    //main method to run the tool
     public static void main (String[] args){
         SwingUtilities.invokeLater(() -> {
             try {
